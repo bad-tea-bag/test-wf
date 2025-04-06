@@ -56,10 +56,9 @@ jobs:
           echo "Random string: $RANDOM_STRING4"
           RANDOM_STRING5=$(openssl rand -base64 16)
           echo "Random string: $RANDOM_STRING5"
-          jq --arg rt1 "$RANDOM_STRING1" \
-             --arg rt2 "$RANDOM_STRING2" \
-             '.BEARER_TOKEN_USER1 = $rt1 |
-              .BEARER_TOKEN_USER2 = $rt2' \
+          jq --arg rt4 "$RANDOM_STRING4" \
+             --arg rt5 "$RANDOM_STRING5" \
+             '{BEARER_TOKEN_USER1: $rt4, BEARER_TOKEN_USER2: $rt5}' \
               > bearer_tokens.json
 
       - name: Print test.json file
