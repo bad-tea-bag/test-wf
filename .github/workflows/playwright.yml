@@ -101,9 +101,9 @@ jobs:
         run: cat tokens.env
         continue-on-error: true
 
-      - name: Export env variables from ./tokens.env
-        run: |
-            dotenv -e ./tokens.env -- bash -c 'echo "Loaded env variables"'
+      - uses: einaregilsson/setup-dotenv@v2
+        with:
+          path: ./tokens.env
 
       #- name: Set up Node.js
         #uses: actions/setup-node@v3
