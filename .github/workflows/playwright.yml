@@ -11,7 +11,9 @@ env:
 jobs:
   decode_secret_data:
     runs-on: ubuntu-latest
-    steps: 
+    steps:
+      - name: print secret
+        run: echo "MY_SECRET=${{ secrets.ENC_JSON }}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: decode file
         run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.ENC_JSON }}" --output ./test.json ./test.json.gpg
