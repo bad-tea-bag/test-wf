@@ -54,8 +54,8 @@ jobs:
               .REFRESH_TOKEN_USER2 = $rt2 |
               .COMPANY_ID = $rt3' \
              test.json > tmp.json && mv tmp.json test.json
-          echo "BEARER_TOKEN_USER1=b1" > .env
-          echo "BEARER_TOKEN_USER2=b2" >> .env
+          echo "BEARER_TOKEN_USER1=b1" > t.env
+          echo "BEARER_TOKEN_USER2=b2" >> t.env
           echo "BEARER_TOKEN_USER1=b1" >> $GITHUB_ENV
           echo "BEARER_TOKEN_USER2=b2" >> $GITHUB_ENV
           cat .env
@@ -65,7 +65,7 @@ jobs:
         continue-on-error: true
 
       - name: Print Tokens.env file
-        run: cat .env
+        run: cat ./t.env
         continue-on-error: true
 
       - name: Encode new file
@@ -83,7 +83,7 @@ jobs:
         uses: actions/cache/save@v3
         with:
           key: bearer-tokens
-          path: .env
+          path: ./t.env
 
   smoke_tests:
     runs-on: ubuntu-latest
@@ -99,12 +99,12 @@ jobs:
           echo "BEARER_TOKEN_USER1=$BEARER_TOKEN_USER1"
           echo "BEARER_TOKEN_USER2=$BEARER_TOKEN_USER2"
 
-     # - uses: actions/checkout@v3 
-      #- name: Get bearer tokens from cache
-       # uses: actions/cache/restore@v3
-       # with:
-        #  key: bearer-tokens
-        #  path: ./tokens.env
+      - uses: actions/checkout@v3 
+      - name: Get bearer tokens from cache
+        uses: actions/cache/restore@v3
+        with:
+          key: bearer-tokens
+          path: ./.env
 
       - name: Print Tokens.env file
         run: cat .env
