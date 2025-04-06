@@ -23,6 +23,20 @@ jobs:
       - name: Print test.json file
         run: cat test.json
         continue-on-error: true
+
+      - name: JSON to env
+        uses: rgarcia-phi/json-to-variables@v1.1.0
+        with:
+          filename: 'test.json'
+          with: json
+          masked: false # !!! set true with secret data !!!
+
+      - name: Print env variables
+        run: |
+            echo "${{ env.json_REFRESH_TOKEN_USER1 }}"
+            echo "${{ env.json_REFRESH_TOKEN_USER2 }}"
+            echo "${{ env.json_COMPANY_ID }}"
+            
       
 
   #smoke_tests:
