@@ -54,10 +54,8 @@ jobs:
               .REFRESH_TOKEN_USER2 = $rt2 |
               .COMPANY_ID = $rt3' \
              test.json > tmp.json && mv tmp.json test.json
-          echo "BEARER_TOKEN_USER1=b1" > t.env
-          echo "BEARER_TOKEN_USER2=b2" >> t.env
-          echo "BEARER_TOKEN_USER1=b1" >> $GITHUB_ENV
-          echo "BEARER_TOKEN_USER2=b2" >> $GITHUB_ENV
+          echo "BEARER_TOKEN_USER1=test1" > t.env
+          echo "BEARER_TOKEN_USER2=test2" >> t.env
           cat .env
 
       - name: Print test.json file
