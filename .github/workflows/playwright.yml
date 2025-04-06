@@ -103,13 +103,13 @@ jobs:
 
       - name: Export env variables
         run: |
-            if [ -f tokens.env ]; then
-                export $(cat tokens.env | xargs)
+            if [ -f ./tokens.env ]; then
+                export $(cat ./tokens.env | xargs)
                 while IFS='=' read -r key value; do
                     echo "$key=$value" >> $GITHUB_ENV
-                done < tokens.env
+                done < ./tokens.env
             else
-                echo "tokens.env file not found, skipping variable export"
+                echo "./tokens.env file not found, skipping variable export"
             fi
             if [ -z "$BEARER_TOKEN_USER1" ]; then
                 echo "BEARER_TOKEN_USER1 not found, using default value"
