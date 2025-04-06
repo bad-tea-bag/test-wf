@@ -69,6 +69,7 @@ jobs:
 
   smoke_tests:
     runs-on: ubuntu-latest
+    needs: ["request_access_tokens_and_update_secret_data"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
