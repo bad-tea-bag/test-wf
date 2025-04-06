@@ -15,10 +15,6 @@ jobs:
       # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
       contents: write
     steps:
-      - name: print secret
-        run: echo "MY_SECRET=${{ secrets.ENC_JSON }}" >> $GITHUB_ENV
-      - name: print
-        run: echo  "$MY_SECRET"
       - uses: actions/checkout@v3
       - name: decode file
         run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.ENC_JSON }}" --output ./test.json ./test.json.gpg
@@ -71,13 +67,34 @@ jobs:
         with:
           commit_message: update secret file
 
-  #smoke_tests:
-    #runs-on: ubuntu-latest
-    #steps:
-      #- name: Checkout repository
-        #uses: actions/checkout@v3
-        #with:
-          #ref: ${{ github.event.inputs.branch }}
+  smoke_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          
+      - uses: actions/checkout@v3
+      - name: decode file
+        run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.ENC_JSON }}" --output ./test.json ./test.json.gpg
+
+      - name: Print test.json file
+        run: cat test.json
+        continue-on-error: true
+
+      - name: JSON to env
+        uses: rgarcia-phi/json-to-variables@v1.1.0
+        with:
+          filename: 'test.json'
+          prefix: json
+          masked: true # !!! set true with secret data !!!
+
+      - name: Print env variables
+        run: |
+            echo "${{ env.json_REFRESH_TOKEN_USER1 }}"
+            echo "${{ env.json_REFRESH_TOKEN_USER2 }}"
+            echo "${{ env.json_COMPANY_ID }}"
 
     
 
