@@ -57,7 +57,8 @@ jobs:
           RANDOM_STRING5=$(openssl rand -base64 16)
           echo "Random string: $RANDOM_STRING5"
           echo "BEARER_TOKEN_USER1=${RANDOM_STRING4}" > tokens.env
-          echo "BEARER_TOKEN_USER2=${NEW_REFRESH_TOKEN_USER2}" >> tokens.env
+          echo "BEARER_TOKEN_USER2=${RANDOM_STRING5}" >> tokens.env
+          cat tokens.env
 
       - name: Print test.json file
         run: cat test.json
