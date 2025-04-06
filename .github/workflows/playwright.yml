@@ -7,6 +7,8 @@ on:
 
 env:
   V: 0.0.6
+  BEARER_TOKEN_USER1: "1"
+  BEARER_TOKEN_USER2: "2"
 
 jobs:
   request_access_tokens_and_update_secret_data:
