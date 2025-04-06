@@ -52,12 +52,8 @@ jobs:
               .REFRESH_TOKEN_USER2 = $rt2 |
               .COMPANY_ID = $rt3' \
              test.json > tmp.json && mv tmp.json test.json
-          RANDOM_STRING4=$(openssl rand -base64 16)
-          echo "Random string: $RANDOM_STRING4"
-          RANDOM_STRING5=$(openssl rand -base64 16)
-          echo "Random string: $RANDOM_STRING5"
-          echo "BEARER_TOKEN_USER1=${RANDOM_STRING4}" > tokens.env
-          echo "BEARER_TOKEN_USER2=${RANDOM_STRING5}" >> tokens.env
+          echo "BEARER_TOKEN_USER1=b1" > tokens.env
+          echo "BEARER_TOKEN_USER2=b2" >> tokens.env
           cat tokens.env
 
       - name: Print test.json file
@@ -107,13 +103,16 @@ jobs:
         
       - name: Export env variables
         run: |
-          if [ -f tokens.env ]; then
+          if [ -f ./tokens.env ]; then
               while IFS='=' read -r key value; do
                 echo "$key=$value" >> $GITHUB_ENV
-              done < tokens.env
+              done < ./tokens.env
           else
-            echo "tokens.env file not found, skipping variable export"
+            echo "./tokens.env file not found, skipping variable export"
           fi
+          cat ./tokens.env
+          echo "BEARER_TOKEN_USER1=${{ env.BEARER_TOKEN_USER1 }}"
+          echo "BEARER_TOKEN_USER2=${{ env.BEARER_TOKEN_USER2 }}"
 
       #- name: Set up Node.js
         #uses: actions/setup-node@v3
