@@ -100,9 +100,6 @@ jobs:
       - name: Print Tokens.env file
         run: cat tokens.env
         continue-on-error: true
-        
-      - name: Install dotenv-cli
-        run: npm install -g dotenv-cli
 
       - name: Export env variables from ./tokens.env
         run: |
