@@ -5,6 +5,9 @@ on:
     branches: [workflow]
   workflow_dispatch:
 
+env:
+  V: 0.0.1
+
 jobs:
   smoke_tests:
     runs-on: ubuntu-latest
