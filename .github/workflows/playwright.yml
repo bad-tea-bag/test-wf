@@ -101,10 +101,10 @@ jobs:
         run: cat tokens.env
         continue-on-error: true
         
-      - name: Load .env variables
+      - name: Load ./tokens.env variables
         run: |
           set -a
-          source .env
+          source ./tokens.env
           set +a
           cat ./tokens.env
           echo "BEARER_TOKEN_USER1=${{ env.BEARER_TOKEN_USER1 }}"
