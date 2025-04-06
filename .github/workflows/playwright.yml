@@ -56,17 +56,15 @@ jobs:
           echo "Random string: $RANDOM_STRING4"
           RANDOM_STRING5=$(openssl rand -base64 16)
           echo "Random string: $RANDOM_STRING5"
-          jq --arg rt1 "$RANDOM_STRING4" \
-             --arg rt2 "$RANDOM_STRING5" \
-             '{BEARER_TOKEN_USER1: $rt1, BEARER_TOKEN_USER2: $rt2}' \
-              > ./bearer_tokens.json
+          echo "BEARER_TOKEN_USER1=${RANDOM_STRING4}" > tokens.env
+          echo "BEARER_TOKEN_USER2=${NEW_REFRESH_TOKEN_USER2}" >> tokens.env
 
       - name: Print test.json file
         run: cat test.json
         continue-on-error: true
 
-      - name: Print bearer_tokens.json file
-        run: cat bearer_tokens.json
+      - name: Print Tokens.env file
+        run: cat tokens.env
         continue-on-error: true
 
       - name: Encode new file
@@ -84,7 +82,7 @@ jobs:
         uses: actions/cache/save@v3
         with:
           key: bearer-tokens
-          path: ./bearer_tokens.json
+          path: ./tokens.env
 
   smoke_tests:
     runs-on: ubuntu-latest
@@ -100,20 +98,27 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           key: bearer-tokens
-          path: ./bearer_tokens.json
-          
+          path: ./tokens.env
 
-      - name: JSON to env
-        uses: rgarcia-phi/json-to-variables@v1.1.0
-        with:
-          filename: 'bearer_tokens.json'
-          prefix: json
-          masked: false # !!! set true with secret data !!!
-
-      - name: Print env variables
+      - name: Export env variables
         run: |
-            echo "${{ env.json.BEARER_TOKEN_USER1 }}"
-            echo "${{ env.json_BEARER_TOKEN_USER2 }}"
+            if [ -f tokens.env ]; then
+                export $(cat tokens.env | xargs)
+                while IFS='=' read -r key value; do
+                    echo "$key=$value" >> $GITHUB_ENV
+                done < tokens.env
+            else
+                echo "tokens.env file not found, skipping variable export"
+            fi
+            if [ -z "$BEARER_TOKEN_USER1" ]; then
+                echo "BEARER_TOKEN_USER1 not found, using default value"
+            fi
+            if [ -z "$BEARER_TOKEN_USER2" ]; then
+                echo "BEARER_TOKEN_USER2 not found, using default value"
+            fi
+            
+            echo "${{ env.BEARER_TOKEN_USER1 }}"
+            echo "${{ env.BEARER_TOKEN_USER2 }}"
 
       #- name: Set up Node.js
         #uses: actions/setup-node@v3
