@@ -54,6 +54,8 @@ jobs:
              test.json > tmp.json && mv tmp.json test.json
           echo "BEARER_TOKEN_USER1=b1" > tokens.env
           echo "BEARER_TOKEN_USER2=b2" >> tokens.env
+          echo "BEARER_TOKEN_USER1=b1" >> $GITHUB_ENV
+          echo "BEARER_TOKEN_USER2=b2" >> $GITHUB_ENV
           cat tokens.env
 
       - name: Print test.json file
@@ -89,6 +91,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.inputs.branch }}
+
+      - name: Print environment variables
+        run: |
+          echo "BEARER_TOKEN_USER1=$BEARER_TOKEN_USER1"
+          echo "BEARER_TOKEN_USER2=$BEARER_TOKEN_USER2"
 
      # - uses: actions/checkout@v3 
       #- name: Get bearer tokens from cache
