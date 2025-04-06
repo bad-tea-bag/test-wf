@@ -101,15 +101,11 @@ jobs:
         run: cat tokens.env
         continue-on-error: true
         
-      - name: Export env variables
+      - name: Load .env variables
         run: |
-          if [ -f ./tokens.env ]; then
-              while IFS='=' read -r key value; do
-                echo "$key=$value" >> $GITHUB_ENV
-              done < ./tokens.env
-          else
-            echo "./tokens.env file not found, skipping variable export"
-          fi
+          set -a
+          source .env
+          set +a
           cat ./tokens.env
           echo "BEARER_TOKEN_USER1=${{ env.BEARER_TOKEN_USER1 }}"
           echo "BEARER_TOKEN_USER2=${{ env.BEARER_TOKEN_USER2 }}"
