@@ -11,6 +11,9 @@ env:
 jobs:
   request_access_tokens_and_update_secret_data:
     runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
+      contents: write
     steps:
       - name: print secret
         run: echo "MY_SECRET=${{ secrets.ENC_JSON }}" >> $GITHUB_ENV
@@ -57,11 +60,16 @@ jobs:
         run: cat test.json
         continue-on-error: true
 
-      #- name: Encode new file
-        #run: |
-          #rm -f ./test.json.gpg
-          #gpg --batch --symmetric --cipher-algo AES256 --passphrase="${{ secrets.ENC_JSON }}" test.json.json
-          #rm -f ./super_secret_data.json
+      - name: Encode new file
+        run: |
+          rm -f ./test.json.gpg
+          gpg --batch --symmetric --cipher-algo AES256 --passphrase="${{ secrets.ENC_JSON }}" test.json.json
+          rm -f ./test.json.json
+
+      - name: Commit new encoded file    
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: update secret file
 
   #smoke_tests:
     #runs-on: ubuntu-latest
