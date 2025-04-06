@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  V: 0.0.1
+  V: 0.0.2
 
 jobs:
   request_access_tokens_and_update_secret_data:
