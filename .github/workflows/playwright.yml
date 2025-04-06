@@ -89,7 +89,7 @@ jobs:
         with:
           filename: 'test.json'
           prefix: json
-          masked: true # !!! set true with secret data !!!
+          masked: false # !!! set true with secret data !!!
 
       - name: Print env variables
         run: |
