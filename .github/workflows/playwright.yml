@@ -63,8 +63,8 @@ jobs:
       - name: Encode new file
         run: |
           rm -f ./test.json.gpg
-          gpg --batch --symmetric --cipher-algo AES256 --passphrase="${{ secrets.ENC_JSON }}" test.json.json
-          rm -f ./test.json.json
+          gpg --batch --symmetric --cipher-algo AES256 --passphrase="${{ secrets.ENC_JSON }}" test.json
+          rm -f ./test.json
 
       - name: Commit new encoded file    
         uses: stefanzweifel/git-auto-commit-action@v5
