@@ -9,7 +9,7 @@ env:
   V: 0.0.1
 
 jobs:
-  decode_secret_data:
+  request_access_tokens_and_update_secret_data:
     runs-on: ubuntu-latest
     steps:
       - name: print secret
@@ -28,16 +28,40 @@ jobs:
         uses: rgarcia-phi/json-to-variables@v1.1.0
         with:
           filename: 'test.json'
-          prefix: ''
+          prefix: json
           masked: false # !!! set true with secret data !!!
 
       - name: Print env variables
         run: |
-            echo "${{ env.REFRESH_TOKEN_USER1 }}"
-            echo "${{ env.REFRESH_TOKEN_USER2 }}"
-            echo "${{ env.COMPANY_ID }}"
+            echo "${{ env.json_REFRESH_TOKEN_USER1 }}"
+            echo "${{ env.json_REFRESH_TOKEN_USER2 }}"
+            echo "${{ env.json_COMPANY_ID }}"
             
-      
+      - name: Generate random strings
+        run: |
+          RANDOM_STRING1=$(openssl rand -base64 16)
+          echo "Random string: $RANDOM_STRING1"
+          RANDOM_STRING2=$(openssl rand -base64 16)
+          echo "Random string: $RANDOM_STRING2"
+          RANDOM_STRING3=$(openssl rand -base64 16)
+          echo "Random string: $RANDOM_STRING3"
+          jq --arg rt1 "$RANDOM_STRING1" \
+             --arg rt2 "$RANDOM_STRING2" \
+             --arg rt3 "$RANDOM_STRING3" \
+             '.REFRESH_TOKEN_USER1 = $rt1 |
+              .REFRESH_TOKEN_USER2 = $rt2 |
+              .COMPANY_ID = $rt3' \
+             test.json > tmp.json && mv tmp.json test.json
+
+      - name: Print test.json file
+        run: cat test.json
+        continue-on-error: true
+
+      #- name: Encode new file
+        #run: |
+          #rm -f ./test.json.gpg
+          #gpg --batch --symmetric --cipher-algo AES256 --passphrase="${{ secrets.ENC_JSON }}" test.json.json
+          #rm -f ./super_secret_data.json
 
   #smoke_tests:
     #runs-on: ubuntu-latest
