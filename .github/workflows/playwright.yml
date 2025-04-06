@@ -110,6 +110,22 @@ jobs:
         run: cat tokens.env
         continue-on-error: true
 
+      - name: Load environment variables from tokens.env
+        run: |
+          if [ -f tokens.env ]; then
+            while IFS='=' read -r key value; do
+              if [ ! -z "$key" ] && [ ! -z "$value" ]; then
+                echo "$key=$value" >> $GITHUB_ENV
+              fi
+            done < tokens.env
+          else
+            echo "tokens.env file not found"
+          fi
+
+      - name: Print environment variables
+        run: |
+          echo "BEARER_TOKEN_USER1=$BEARER_TOKEN_USER1"
+          echo "BEARER_TOKEN_USER2=$BEARER_TOKEN_USER2"
       #- name: Set up Node.js
         #uses: actions/setup-node@v3
         #with:
