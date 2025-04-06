@@ -107,23 +107,13 @@ jobs:
         
       - name: Export env variables
         run: |
-            if [ -f ./tokens.env ]; then
-                export $(cat ./tokens.env | xargs)
-                while IFS='=' read -r key value; do
-                    echo "$key=$value" >> $GITHUB_ENV
-                done < ./tokens.env
-            else
-                echo "./tokens.env file not found, skipping variable export"
-            fi
-            if [ -z "$BEARER_TOKEN_USER1" ]; then
-                echo "BEARER_TOKEN_USER1 not found, using default value"
-            fi
-            if [ -z "$BEARER_TOKEN_USER2" ]; then
-                echo "BEARER_TOKEN_USER2 not found, using default value"
-            fi
-            
-            echo "${{ env.BEARER_TOKEN_USER1 }}"
-            echo "${{ env.BEARER_TOKEN_USER2 }}"
+          if [ -f ./tokens.env ]; then
+              while IFS='=' read -r key value; do
+                echo "$key=$value" >> $GITHUB_ENV
+              done < ./tokens.env
+          else
+            echo "./tokens.env file not found, skipping variable export"
+          fi
 
       #- name: Set up Node.js
         #uses: actions/setup-node@v3
