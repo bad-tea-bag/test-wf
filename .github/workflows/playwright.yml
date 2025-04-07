@@ -54,16 +54,17 @@ jobs:
               .REFRESH_TOKEN_USER2 = $rt2 |
               .COMPANY_ID = $rt3' \
              test.json > tmp.json && mv tmp.json test.json
-          echo "BEARER_TOKEN_USER1=test1" > t.env
-          echo "BEARER_TOKEN_USER2=test2" >> t.env
-          cat .env
+          touch tokens.env
+          echo "BEARER_TOKEN_USER1=test1" > tokens.env
+          echo "BEARER_TOKEN_USER2=test2" >> tokens.env
+          cat tokens.env
 
       - name: Print test.json file
         run: cat test.json
         continue-on-error: true
 
       - name: Print Tokens.env file
-        run: cat ./t.env
+        run: cat ./tokens.env
         continue-on-error: true
 
       - name: Encode new file
@@ -81,7 +82,7 @@ jobs:
         uses: actions/cache/save@v3
         with:
           key: bearer-tokens
-          path: ./t.env
+          path: ./tokens.env
 
   smoke_tests:
     runs-on: ubuntu-latest
