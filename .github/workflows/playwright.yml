@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  V: 0.0.6
+  V: 0.0.7
   BEARER_TOKEN_USER1: "1"
   BEARER_TOKEN_USER2: "2"
 
