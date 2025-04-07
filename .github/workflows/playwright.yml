@@ -114,6 +114,7 @@ jobs:
             while IFS='=' read -r key value; do
               if [ ! -z "$key" ] && [ ! -z "$value" ]; then
                 echo "$key=$value" >> $GITHUB_ENV
+                echo "::add-mask::$value"
               fi
             done < ./tokens.env
           else
