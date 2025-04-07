@@ -110,14 +110,14 @@ jobs:
 
       - name: Load environment variables from .env
         run: |
-          if [ -f .env ]; then
+          if [ -f ./tokens.env ]; then
             while IFS='=' read -r key value; do
               if [ ! -z "$key" ] && [ ! -z "$value" ]; then
                 echo "$key=$value" >> $GITHUB_ENV
               fi
-            done < .env
+            done < ./tokens.env
           else
-            echo ".env file not found"
+            echo "./tokens.env file not found"
           fi
 
       - name: Print environment variables
