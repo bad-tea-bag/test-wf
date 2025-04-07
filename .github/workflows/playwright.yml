@@ -98,15 +98,14 @@ jobs:
           echo "BEARER_TOKEN_USER1=$BEARER_TOKEN_USER1"
           echo "BEARER_TOKEN_USER2=$BEARER_TOKEN_USER2"
 
-      - uses: actions/checkout@v3 
       - name: Get bearer tokens from cache
         uses: actions/cache/restore@v3
         with:
           key: bearer-tokens
-          path: ./.env
+          path: ./tokens.env
 
-      - name: Print Tokens.env file
-        run: cat .env
+      - name: Print ./tokens.env file
+        run: cat ./tokens.env
         continue-on-error: true
 
       - name: Load environment variables from .env
