@@ -185,10 +185,24 @@ jobs:
         if: always()
         run: |
           REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          echo "### 🧪 Allure Report: [$REPORT_URL]($REPORT_URL)" >> $GITHUB_STEP_SUMMARY
+          SUMMARY_FILE=$(find allure-history -type f -path "*/widgets/summary.json" | head -n 1)
+
+          if [ -f "$SUMMARY_FILE" ]; then
+            PASSED=$(jq '.stat.passed' "$SUMMARY_FILE")
+            FAILED=$(jq '.stat.failed' "$SUMMARY_FILE")
+            BROKEN=$(jq '.stat.broken' "$SUMMARY_FILE")
+            SKIPPED=$(jq '.stat.skipped' "$SUMMARY_FILE")
+            TOTAL=$((PASSED + FAILED + BROKEN + SKIPPED))
+
+            echo "### 🧪 Allure Report: [$REPORT_URL]($REPORT_URL)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Total | Passed | Failed | Broken | Skipped |" >> $GITHUB_STEP_SUMMARY
+            echo "|-------|--------|--------|--------|---------|" >> $GITHUB_STEP_SUMMARY
+            echo "| $TOTAL | $PASSED | $FAILED | $BROKEN | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Could not find summary.json" >> $GITHUB_STEP_SUMMARY
+          fi
           
-        
-  
   clear-cache:
     runs-on: ubuntu-latest
     needs: ["smoke_tests"]
