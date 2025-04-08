@@ -185,7 +185,7 @@ jobs:
         if: always()
         run: |
           REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          SUMMARY_FILE=$(find allure-history -type f -path "*/widgets/summary.json" | head -n 1)
+          SUMMARY_FILE="./${{ github.run_number }}/widgets/summary.json"
 
           if [ -f "$SUMMARY_FILE" ]; then
             PASSED=$(jq '.stat.passed' "$SUMMARY_FILE")
