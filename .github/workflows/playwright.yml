@@ -182,7 +182,7 @@ jobs:
           PUBLISH_BRANCH: allure-report
           PUBLISH_DIR: allure-history
       - name: List files in current directory
-        run: ls -la allure-report
+        run: ls -la allure-report/widgets
       - name: Add report link to GitHub Summary
         if: always()
         run: |
@@ -190,11 +190,11 @@ jobs:
           SUMMARY_FILE="./allure-report/widgets/summary.json"
 
           if [ -f "$SUMMARY_FILE" ]; then
-            PASSED=$(jq '.stat.passed' "$SUMMARY_FILE")
-            FAILED=$(jq '.stat.failed' "$SUMMARY_FILE")
-            BROKEN=$(jq '.stat.broken' "$SUMMARY_FILE")
-            SKIPPED=$(jq '.stat.skipped' "$SUMMARY_FILE")
-            TOTAL=$((PASSED + FAILED + BROKEN + SKIPPED))
+            PASSED=$(jq '.statistic.passed' "$SUMMARY_FILE")
+            FAILED=$(jq '.statistic.failed' "$SUMMARY_FILE")
+            BROKEN=$(jq '.statistic.broken' "$SUMMARY_FILE")
+            SKIPPED=$(jq '.statistic.skipped' "$SUMMARY_FILE")
+            TOTAL=$(jq '.statistic.total' "$SUMMARY_FILE")
 
             echo "### 🧪 Allure Report: [$REPORT_URL]($REPORT_URL)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
