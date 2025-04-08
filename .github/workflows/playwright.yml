@@ -182,12 +182,12 @@ jobs:
           PUBLISH_BRANCH: allure-report
           PUBLISH_DIR: allure-history
       - name: List files in current directory
-        run: ls -la
+        run: ls -la allure-report
       - name: Add report link to GitHub Summary
         if: always()
         run: |
           REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          SUMMARY_FILE="./allure-results/widgets/summary.json"
+          SUMMARY_FILE="./allure-report/widgets/summary.json"
 
           if [ -f "$SUMMARY_FILE" ]; then
             PASSED=$(jq '.stat.passed' "$SUMMARY_FILE")
