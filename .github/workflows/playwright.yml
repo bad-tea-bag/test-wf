@@ -165,8 +165,8 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-          ref: allure-report
-          path: allure-report
+          ref: gh-pages
+          path: gh-pages
       - name: Build Report
         uses: simple-elf/allure-report-action@master
         if: always()
@@ -180,9 +180,7 @@ jobs:
         env: 
           PERSONAL_TOKEN: ${{ secrets.GH_TOKEN }}
           PUBLISH_BRANCH: allure-report
-          PUBLISH_DIR: allure-history
-      - name: List files in current directory
-        run: ls -la allure-report/widgets
+          PUBLISH_DIR: gh-pages
       - name: Add report link to GitHub Summary
         if: always()
         run: |
