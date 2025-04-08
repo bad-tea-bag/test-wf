@@ -1,0 +1,14 @@
+# Playwright
+/node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/.playwright/
+/.playwright-test/
+/.playwright-test-results/
+/.playwright-test-report/
+.env
+*.env
+*.env.local
+bearer_tokens.json

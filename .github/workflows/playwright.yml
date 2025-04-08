@@ -1,0 +1,204 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [workflow]
+  workflow_dispatch:
+
+env:
+  V: 0.1.0
+  BEARER_TOKEN_USER1: "1"
+  BEARER_TOKEN_USER2: "2"
+
+jobs:
+  request_access_tokens_and_update_secret_data:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: decode file
+        run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.ENC_JSON }}" --output ./test.json ./test.json.gpg
+
+      - name: Print test.json file
+        run: cat test.json
+        continue-on-error: true
+
+      - name: JSON to env
+        uses: rgarcia-phi/json-to-variables@v1.1.0
+        with:
+          filename: 'test.json'
+          prefix: json
+          masked: false # !!! set true with secret data !!!
+
+      - name: Print env variables
+        run: |
+            echo "${{ env.json_REFRESH_TOKEN_USER1 }}"
+            echo "${{ env.json_REFRESH_TOKEN_USER2 }}"
+            echo "${{ env.json_COMPANY_ID }}"
+            
+      - name: Generate random strings
+        run: |
+          RANDOM_STRING1=$(openssl rand -base64 16)
+          echo "Random string: $RANDOM_STRING1"
+          RANDOM_STRING2=$(openssl rand -base64 16)
+          echo "Random string: $RANDOM_STRING2"
+          RANDOM_STRING3=$(openssl rand -base64 16)
+          echo "Random string: $RANDOM_STRING3"
+          jq --arg rt1 "$RANDOM_STRING1" \
+             --arg rt2 "$RANDOM_STRING2" \
+             --arg rt3 "$RANDOM_STRING3" \
+             '.REFRESH_TOKEN_USER1 = $rt1 |
+              .REFRESH_TOKEN_USER2 = $rt2 |
+              .COMPANY_ID = $rt3' \
+             test.json > tmp.json && mv tmp.json test.json
+          touch tokens.env
+          echo "BEARER_TOKEN_USER1=test1" > tokens.env
+          echo "BEARER_TOKEN_USER2=test2" >> tokens.env
+          cat tokens.env
+
+      - name: Print test.json file
+        run: cat test.json
+        continue-on-error: true
+
+      - name: Print Tokens.env file
+        run: cat ./tokens.env
+        continue-on-error: true
+
+      - name: Encode new file
+        run: |
+          rm -f ./test.json.gpg
+          gpg --batch --symmetric --cipher-algo AES256 --passphrase="${{ secrets.ENC_JSON }}" test.json
+          rm -f ./test.json
+
+      - name: Commit new encoded file    
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: update secret file
+          
+      - name: Add bearer tokens to cache
+        uses: actions/cache/save@v3
+        with:
+          key: bearer-tokens
+          path: ./tokens.env
+
+  smoke_tests:
+    runs-on: ubuntu-latest
+    needs: ["request_access_tokens_and_update_secret_data"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Print environment variables
+        run: |
+          echo "BEARER_TOKEN_USER1=$BEARER_TOKEN_USER1"
+          echo "BEARER_TOKEN_USER2=$BEARER_TOKEN_USER2"
+
+      - name: Get bearer tokens from cache
+        uses: actions/cache/restore@v3
+        with:
+          key: bearer-tokens
+          path: ./tokens.env
+
+      - name: Print ./tokens.env file
+        run: cat ./tokens.env
+        continue-on-error: true
+
+      - name: Load environment variables from .env
+        run: |
+          if [ -f ./tokens.env ]; then
+            while IFS='=' read -r key value; do
+              if [ ! -z "$key" ] && [ ! -z "$value" ]; then
+                echo "$key=$value" >> $GITHUB_ENV
+                echo "::add-mask::$value"
+              fi
+            done < ./tokens.env
+          else
+            echo "./tokens.env file not found"
+          fi
+
+      - name: Print environment variables
+        run: |
+          echo "BEARER_TOKEN_USER1=$BEARER_TOKEN_USER1"
+          echo "BEARER_TOKEN_USER2=$BEARER_TOKEN_USER2"
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23.6.0'
+
+      - name: Install ci dependency
+        run: npm ci
+
+      - name: Install browsers
+        run: npx playwright install chromium
+
+      - name: Run Playwright tests
+        run: npx playwright test tests/example.spec.ts
+
+      - name: Store allure results
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: ./allure-results
+          retention-days: 1
+
+
+  generate-and-publish-allure-report:
+    runs-on: ubuntu-latest
+    needs: ["smoke_tests"]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'microsoft'
+          java-version: '21'
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+      - name: Get Allure history
+        uses: actions/checkout@v3
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+      - name: Build Report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: allure-results
+          allure_history: allure-history
+          keep_reports: 20
+      - name: Publish Report
+        if: always()
+        uses: peaceiris/actions-gh-pages@v2
+        env: 
+          PERSONAL_TOKEN: ${{ secrets.GH_TOKEN }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: allure-history
+      - name: Add report link to GitHub Summary
+        if: always()
+        run: |
+          REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo "### 🧪 Allure Report: [$REPORT_URL]($REPORT_URL)" >> $GITHUB_STEP_SUMMARY
+          
+        
+  
+  clear-cache:
+    runs-on: ubuntu-latest
+    needs: ["smoke_tests"]
+    if: ${{ always() }}
+    steps:
+      - name: Clear bearer-tokens cache
+        run: |
+          curl -L \
+          -X DELETE \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          "https://api.github.com/repos/bad-tea-bag/test-wf/actions/caches?key=bearer-tokens"
