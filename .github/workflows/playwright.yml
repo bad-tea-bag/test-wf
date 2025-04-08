@@ -181,6 +181,8 @@ jobs:
           PERSONAL_TOKEN: ${{ secrets.GH_TOKEN }}
           PUBLISH_BRANCH: allure-report
           PUBLISH_DIR: allure-history
+      - name: List files in current directory
+        run: ls -la
       - name: Add report link to GitHub Summary
         if: always()
         run: |
