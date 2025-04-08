@@ -179,8 +179,8 @@ jobs:
         uses: peaceiris/actions-gh-pages@v2
         env: 
           PERSONAL_TOKEN: ${{ secrets.GH_TOKEN }}
-          PUBLISH_BRANCH: allure-report
-          PUBLISH_DIR: gh-pages
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: allure-history
       - name: Add report link to GitHub Summary
         if: always()
         run: |
