@@ -196,7 +196,7 @@ jobs:
 
             echo "### 🧪 Allure Report: [$REPORT_URL]($REPORT_URL)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "| Total | Passed | Failed | Broken | Skipped |" >> $GITHUB_STEP_SUMMARY
+            echo "| Total |✅ Passed |❌ Failed |⚠️ Broken |✖️ Skipped |" >> $GITHUB_STEP_SUMMARY
             echo "|-------|--------|--------|--------|---------|" >> $GITHUB_STEP_SUMMARY
             echo "| $TOTAL | $PASSED | $FAILED | $BROKEN | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
           else
